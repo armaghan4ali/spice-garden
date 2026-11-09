@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Spice Garden Restaurant</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; font-family: Arial, sans-serif; }
+  body { background: #fffaf3; color: #333; }
+  header { background: #b33a1f; color: white; padding: 20px; text-align: center; }
+  header h1 { font-size: 2rem; }
+  nav a { color: white; margin: 0 10px; text-decoration: none; font-weight: bold; }
+  .hero { background: #f4d9b0; padding: 60px 20px; text-align: center; }
+  .hero h2 { font-size: 1.8rem; margin-bottom: 10px; }
+  .btn { display: inline-block; margin-top: 15px; padding: 12px 25px; background: #b33a1f;
+         color: white; border-radius: 25px; text-decoration: none; }
+  section { padding: 40px 20px; max-width: 900px; margin: auto; }
+  section h2 { color: #b33a1f; margin-bottom: 20px; text-align: center; }
+  .menu { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; }
+  .item { background: white; padding: 20px; border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+  .item h3 { margin-bottom: 5px; }
+  .price { color: #b33a1f; font-weight: bold; }
+  footer { background: #333; color: white; text-align: center; padding: 20px; }
+
+  /* Chatbot */
+  #chat-btn { position: fixed; bottom: 20px; right: 20px; background: #b33a1f; color: white;
+              border: none; border-radius: 50%; width: 60px; height: 60px; font-size: 26px; cursor: pointer; }
+  #chat-box { display: none; position: fixed; bottom: 90px; right: 20px; width: 300px; max-width: 90vw;
+              background: white; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.2); overflow: hidden; }
+  #chat-head { background: #b33a1f; color: white; padding: 12px; font-weight: bold; }
+  #chat-msgs { height: 280px; overflow-y: auto; padding: 10px; }
+  .msg { margin: 8px 0; padding: 8px 12px; border-radius: 10px; max-width: 85%; font-size: 14px; }
+  .bot { background: #f1f1f1; }
+  .user { background: #b33a1f; color: white; margin-left: auto; }
+  #chat-input { display: flex; border-top: 1px solid #ddd; }
+  #chat-input input { flex: 1; padding: 10px; border: none; outline: none; }
+  #chat-input button { background: #b33a1f; color: white; border: none; padding: 10px 15px; cursor: pointer; }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>🌶️ Spice Garden</h1>
+  <nav><a href="#menu">Menu</a><a href="#about">About</a><a href="#contact">Contact</a></nav>
+</header>
+
+<div class="hero">
+  <h2>Authentic Desi Flavours, Made Fresh Daily</h2>
+  <p>Dine in, take away, or get it delivered to your door.</p>
+  <a href="#contact" class="btn">Book a Table</a>
+</div>
+
+<section id="menu">
+  <h2>Our Menu</h2>
+  <div class="menu">
+    <div class="item"><h3>Chicken Karahi</h3><p>Slow-cooked in tomato & spices</p><p class="price">Rs 1,800</p></div>
+    <div class="item"><h3>Beef Biryani</h3><p>Fragrant rice, tender beef</p><p class="price">Rs 650</p></div>
+    <div class="item"><h3>Seekh Kebab</h3><p>Char-grilled, 4 pieces</p><p class="price">Rs 900</p></div>
+    <div class="item"><h3>Garlic Naan</h3><p>Fresh from the tandoor</p><p class="price">Rs 120</p></div>
+  </div>
+</section>
+
+<section id="about">
+  <h2>About Us</h2>
+  <p style="text-align:center">Family-run since 2015, serving home-style cooking with the freshest ingredients.</p>
+</section>
+
+<section id="contact">
+  <h2>Contact & Location</h2>
+  <p style="text-align:center">📍 Main Boulevard, Lahore<br>📞 0300-0000000<br>🕐 12 PM – 12 AM, every day</p>
+</section>
+
+<footer>© Spice Garden. All rights reserved.</footer>
+
+<button id="chat-btn" onclick="toggleChat()">💬</button>
+<div id="chat-box">
+  <div id="chat-head">Spice Garden Assistant</div>
+  <div id="chat-msgs"></div>
+  <div id="chat-input">
+    <input id="user-text" placeholder="Ask me anything..." onkeypress="if(event.key==='Enter')send()">
+    <button onclick="send()">Send</button>
+  </div>
+</div>
+
+<script>
+  const answers = [
+    { keys: ["menu", "food", "dish", "khana"], reply: "We serve Chicken Karahi, Beef Biryani, Seekh Kebab, Naan and more! Scroll to our Menu section to see everything." },
+    { keys: ["price", "cost", "rate", "kitna"], reply: "Biryani is Rs 650, Seekh Kebab Rs 900, and Chicken Karahi Rs 1,800. Full prices are in the Menu section." },
+    { keys: ["time", "open", "close", "timing", "hours"], reply: "We're open every day from 12 PM to 12 AM." },
+    { keys: ["deliver", "delivery", "home"], reply: "Yes! We deliver within 5 km. Call 0300-0000000 to order." },
+    { keys: ["location", "address", "where", "kahan"], reply: "We're on Main Boulevard, Lahore." },
+    { keys: ["book", "table", "reserve", "reservation"], reply: "To book a table, call 0300-0000000. We recommend booking ahead on weekends!" },
+    { keys: ["hi", "hello", "salam", "assalam"], reply: "Hello! 👋 How can I help you today? Ask about our menu, prices, timing, delivery, or bookings." }
+  ];
+
+  function toggleChat() {
+    const box = document.getElementById("chat-box");
+    const open = box.style.display === "block";
+    box.style.display = open ? "none" : "block";
+    if (!open && !document.getElementById("chat-msgs").innerHTML) {
+      addMsg("Hi! 👋 I'm the Spice Garden assistant. Ask me about our menu, prices, timing, delivery, or bookings.", "bot");
+    }
+  }
+
+  function addMsg(text, who) {
+    const div = document.createElement("div");
+    div.className = "msg " + who;
+    div.textContent = text;
+    const msgs = document.getElementById("chat-msgs");
+    msgs.appendChild(div);
+    msgs.scrollTop = msgs.scrollHeight;
+  }
+
+  function send() {
+    const input = document.getElementById("user-text");
+    const text = input.value.trim();
+    if (!text) return;
+    addMsg(text, "user");
+    input.value = "";
+    const lower = text.toLowerCase();
+    const match = answers.find(a => a.keys.some(k => lower.includes(k)));
+    setTimeout(() => addMsg(match ? match.reply : "Sorry, I didn't get that. Please call 0300-0000000 and our team will help you!", "bot"), 500);
+  }
+</script>
+</body>
+</html>
